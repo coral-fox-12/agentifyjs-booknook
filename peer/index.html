@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Harbor Delivery Co. — an open agentic delivery site. Other agent sites call its delivery network, which runs in their visitor's browser.">
+<title>Harbor Delivery Co. — an open agentic delivery site</title>
+<style>body{font:16px/1.55 system-ui,sans-serif;color:#1d2733;background:#fdfbf7;max-width:720px;margin:0 auto;padding:1rem}h1{font-size:1.5rem}table{border-collapse:collapse}th,td{border:1px solid #e3d9c8;padding:.4rem .7rem;text-align:left}code{background:#f3e7d8;padding:.1rem .3rem;border-radius:4px}</style>
+<link rel="agent-manifest" href="agent-manifest.json">
+</head>
+<body>
+<h1>Harbor Delivery Co.</h1>
+<p>We deliver books (and anything else that fits in a bicycle basket) around the harbor.
+This is an <strong>agent site</strong>: other agent sites can call our delivery network,
+and it runs in <em>their visitor's</em> browser on <em>their</em> model. We never see
+a visitor's API key, and we never run code on our own servers — there are none.</p>
+<h2>Delivery prices</h2>
+<table>
+<thead><tr><th>Zone</th><th>Where</th><th>Fee</th></tr></thead>
+<tbody>
+<tr><td>Local</td><td>Old Town, Harbor, Pier, Dock</td><td>$2.00</td></tr>
+<tr><td>City</td><td>North, University, Hill</td><td>$5.00</td></tr>
+<tr><td>Outskirts</td><td>Anywhere else</td><td>$9.00</td></tr>
+</tbody>
+</table>
+<p>Orders of more than 3 books add $0.50 per extra book. Slots today: 18:00, 19:30; tomorrow: 09:00, 12:00.</p>
+<h2>Agent artifacts</h2>
+<ul>
+<li><a href="agent-manifest.json"><code>agent-manifest.json</code></a> — our published networks</li>
+<li><a href="delivery.network.json"><code>delivery.network.json</code></a> — the delivery network definition</li>
+<li><a href="links.json"><code>links.json</code></a> — peer link map (we call no peers)</li>
+<li><a href=".well-known/agent-card.json">agent card</a></li>
+</ul>
+<p>Built for the <a href="https://cognizant-agenticweb.devpost.com/">Open Agentic Web Challenge</a>.
+Open source (MIT). Demo only — no real deliveries are made.</p>
+</body>
+</html>

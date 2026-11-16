@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The Book Nook — a working bookshop whose catalog, cart and checkout are tools an AI agent can call. AgentifyJS turns any page into an agent-readable page.">
+<title>The Book Nook — an open agentic bookshop</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="agent-manifest" href="agent-manifest.json">
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">&#128218;</span>
+    <div>
+      <h1>The Book Nook</h1>
+      <p class="tagline">A small independent bookshop &middot; agentified with <a href="agentify.js">AgentifyJS</a></p>
+    </div>
+  </div>
+  <nav aria-label="Main">
+    <a href="#catalog">Catalog</a>
+    <a href="#cart">Cart</a>
+    <a href="#orders">Orders</a>
+    <a href="#agent">Ask the Nook</a>
+  </nav>
+</header>
+
+<main>
+  <section id="intro" class="intro">
+    <h2>Browse, ask, and order — by hand or by agent</h2>
+    <p>This is a real working bookshop page. Every button, form and list on it is
+    machine-readable: the <strong>AgentifyJS</strong> library turns the live page into
+    tool definitions an AI agent can call, and the browser runtime below runs a
+    three-agent network (<code>booknook_assistant</code>) that answers questions,
+    fills your cart, and checks out — with your confirmation before anything is
+    ordered. Delivery is arranged with our partner site,
+    <strong>Harbor Delivery Co.</strong>, a second agent site that our network calls
+    after you approve the contact. No server, no tracking, no payment: orders are
+    demos and your LLM key (if you add one) never leaves your browser.</p>
+    <p class="spec-note">Conforms to the
+    <a href="https://github.com/cognizant-ai-labs/agentic-web/blob/main/docs/worldwide_agentic_web_mvp_spec.md">Minimum Viable Specification for a Worldwide Agentic Web (MVP 0.2)</a>:
+    public <a href="agent-manifest.json"><code>agent-manifest.json</code></a>,
+    <a href="booknook.network.json"><code>booknook.network.json</code></a>,
+    <a href="links.json"><code>links.json</code></a> and a browser runtime.
+    See <a href="SPEC-CONFORMANCE.md">SPEC-CONFORMANCE.md</a> for the mapping.</p>
+  </section>
+
+  <section id="catalog" class="catalog" aria-label="Book catalog" data-agent-action="website_get_page_state" data-agent-description="Read the live catalog, cart, and latest order from the shop page">
+    <h2>Catalog</h2>
+    <form id="search-form" data-agent-action="website_search_catalog" data-agent-description="Search the book catalog by title, author, or genre">
+      <label for="search-input">Search the catalog</label>
+      <input id="search-input" name="query" type="search" placeholder="Try: fantasy, Dune, Reyes&hellip;" autocomplete="off">
+      <label for="genre-select">Genre</label>
+      <select id="genre-select" name="genre">
+        <option value="">All genres</option>
+        <option value="fantasy">Fantasy</option>
+        <option value="sci-fi">Science fiction</option>
+        <option value="mystery">Mystery</option>
+        <option value="history">History</option>
+        <option value="poetry">Poetry</option>
+        <option value="children">Children's</option>
+      </select>
+      <button type="submit">Search</button>
+    </form>
+    <div id="book-grid" class="book-grid" role="list" aria-live="polite"></div>
+    <p id="catalog-empty" class="empty" hidden>No books match that search.</p>
+  </section>
+
+  <section id="cart" class="cart" aria-label="Shopping cart">
+    <h2>Your cart</h2>
+    <div id="cart-contents" aria-live="polite"><p class="empty">Your cart is empty.</p></div>
+    <p id="cart-total" class="total" hidden>Total: <strong id="cart-total-value">$0.00</strong></p>
+    <button type="button" id="clear-cart" class="secondary" data-agent-action="website_set_cart" data-agent-params='{"items":[]}' data-agent-description="Replace the whole cart — an empty list clears it">Clear cart</button>
+    <form id="checkout-form" data-agent-action="website_checkout_demo_order" data-agent-description="Place a demo order for the current cart (pickup or delivery)">
+      <h3>Demo checkout</h3>
+      <label for="customer-name">Your name
+        <input id="customer-name" name="name" type="text" required placeholder="Ada Lovelace">
+      </label>
+      <label for="fulfillment">Fulfillment
+        <select id="fulfillment" name="fulfillment">
+          <option value="pickup">Pickup at the shop (free)</option>
+          <option value="delivery">Delivery by Harbor Delivery Co.</option>
+        </select>
+      </label>
+      <label for="delivery-address" id="address-label" hidden>Delivery address
+        <input id="delivery-address" name="address" type="text" placeholder="12 Harbor Lane, Old Town">
+      </label>
+      <button type="submit" data-agent-action="website_checkout_demo_order">Place demo order</button>
+      <p class="fineprint">Demo only. No payment is collected and no books are shipped.</p>
+    </form>
+  </section>
+
+  <section id="orders" class="orders" aria-label="Orders" data-agent-action="website_get_order_status" data-agent-description="Read the latest demo order and its status">
+    <h2>Orders</h2>
+    <div id="order-list" aria-live="polite"><p class="empty">No demo orders yet.</p></div>
+  </section>
+
+  <section id="agent" class="agent" aria-label="Agent assistant">
+    <h2>Ask the Nook <span class="badge">agent network: booknook_assistant</span></h2>
+    <p class="agent-intro">Talk to the shop's agent network. It reads the live catalog and cart,
+    and can add books, check out, and arrange delivery. Try:
+    <button class="sample-query" type="button">What fantasy books do you have?</button>
+    <button class="sample-query" type="button">Add two copies of The Glass Meridian to my cart</button>
+    <button class="sample-query" type="button">Check out for pickup, name Ada</button>
+    <button class="sample-query" type="button">Arrange delivery for my order</button>
+    </p>
+    <div id="agent-mount"></div>
+    <details id="model-settings">
+      <summary>&#9881; AI model settings</summary>
+      <form id="settings-form">
+        <p class="settings-note">By default the shop runs on its built-in <strong>demo model</strong>
+        (deterministic, no key, no network calls). To use a real LLM, choose an
+        OpenAI-compatible router and paste your key. The key is stored only in
+        this browser and is sent only to the router you choose — never to this
+        site, never to a peer site.</p>
+        <label for="router-select">Router
+          <select id="router-select" name="router">
+            <option value="mock">Demo model (built in, no key)</option>
+            <option value="openai">OpenAI-compatible (BYOK)</option>
+            <option value="openrouter">OpenRouter (BYOK)</option>
+          </select>
+        </label>
+        <label for="router-url">Router base URL
+          <input id="router-url" name="baseUrl" type="url" value="" placeholder="https://api.openai.com/v1">
+        </label>
+        <label for="router-model">Model
+          <input id="router-model" name="model" type="text" value="" placeholder="gpt-4o-mini">
+        </label>
+        <label for="router-key">API key
+          <input id="router-key" name="apiKey" type="password" value="" autocomplete="off" placeholder="sk-...">
+        </label>
+        <div class="settings-actions">
+          <button type="submit">Save and start</button>
+          <button type="button" id="settings-delete">Delete saved key</button>
+        </div>
+        <p id="settings-status" class="settings-status" aria-live="polite"></p>
+      </form>
+    </details>
+    <details id="activity-log" open>
+      <summary>Agent activity (observable execution — no secrets shown)</summary>
+      <ol id="activity-list"></ol>
+    </details>
+  </section>
+</main>
+
+<dialog id="confirm-dialog" aria-label="Confirm action">
+  <form method="dialog">
+    <h3>Confirm this action</h3>
+    <p id="confirm-text"></p>
+    <dl id="confirm-args"></dl>
+    <div class="dialog-actions">
+      <button id="confirm-yes" value="yes" type="submit">Confirm</button>
+      <button id="confirm-no" value="no" type="submit">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="consent-dialog" aria-label="Consent to contact another agent site">
+  <form method="dialog">
+    <h3>Contact another agent site?</h3>
+    <p id="consent-text"></p>
+    <p class="fineprint">The peer network runs in <em>your</em> browser, on <em>your</em> model.
+    Your API key is never sent to the peer site, and the peer cannot change your model.</p>
+    <label class="consent-remember"><input id="consent-remember" type="checkbox"> Remember for this origin in this session</label>
+    <div class="dialog-actions">
+      <button id="consent-yes" value="yes" type="submit">Allow contact</button>
+      <button id="consent-no" value="no" type="submit">Deny</button>
+    </div>
+  </form>
+</dialog>
+
+<footer class="site-footer">
+  <p>The Book Nook &middot; demo bookshop &middot; open source (MIT) &middot;
+  built with <a href="agentify.js">AgentifyJS</a> for the
+  <a href="https://cognizant-agenticweb.devpost.com/">Open Agentic Web Challenge</a> &middot;
+  <a href="agent-manifest.json">agent-manifest.json</a> &middot;
+  <a href=".well-known/agent-card.json">agent card</a></p>
+</footer>
+
+<script type="module" src="site.js"></script>
+</body>
+</html>

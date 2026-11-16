@@ -1,0 +1,1 @@
+{"networks": {"booknook_assistant": {"delivery": "https://harbor-delivery.surge.sh/delivery"}}, "note": "Production peer binding (Surge). For local development, override with ?peer=http://127.0.0.1:8472/delivery or save a peer URL in localStorage under 'booknook-peer-url'.", "version": 1}
